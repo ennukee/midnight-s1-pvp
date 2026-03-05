@@ -13,6 +13,12 @@ const STARTING_HERALDRY = 9
 const MAX_CONQUEST = 1600
 const MAX_BLOODY_TOKENS = 1600
 const SLOT_CONFIG_STORAGE_KEY = 'pvp-slot-calc.slot-config.v1'
+const IMAGE_PATHS = {
+  bg: `${import.meta.env.BASE_URL}bg.jpg`,
+  conquest: `${import.meta.env.BASE_URL}conquest.jpg`,
+  bloodyToken: `${import.meta.env.BASE_URL}bloodytoken.jpg`,
+  heraldry: `${import.meta.env.BASE_URL}heraldry.jpg`,
+} as const
 
 type Subtype = 'conquest' | 'bloody token' | 'heraldry' | 'none'
 
@@ -37,13 +43,13 @@ const createSlot = (
 })
 
 const subtypes = [
-  { key: 'conquest', label: 'Conquest', image: '/conquest.jpg' as const },
+  { key: 'conquest', label: 'Conquest', image: IMAGE_PATHS.conquest },
   {
     key: 'bloody token',
     label: 'Bloody Token',
-    image: '/bloodytoken.jpg' as const,
+    image: IMAGE_PATHS.bloodyToken,
   },
-  { key: 'heraldry', label: 'Heraldry', image: '/heraldry.jpg' as const },
+  { key: 'heraldry', label: 'Heraldry', image: IMAGE_PATHS.heraldry },
   { key: 'none', label: 'None', image: null },
 ] as const
 
@@ -261,7 +267,7 @@ function App() {
     <main className="relative min-h-screen overflow-hidden bg-background p-6">
       <div
         className="pointer-events-none absolute inset-0 bg-cover bg-center blur-sm"
-        style={{ backgroundImage: "url('/bg.jpg')" }}
+        style={{ backgroundImage: `url('${IMAGE_PATHS.bg}')` }}
       />
       <div className="pointer-events-none absolute inset-0 bg-background/70" />
 
@@ -348,7 +354,7 @@ function App() {
                   <div className="mt-2 space-y-2">
                     <div className="flex items-center gap-3 rounded bg-background/20 px-3 py-2">
                       <img
-                        src="/conquest.jpg"
+                        src={IMAGE_PATHS.conquest}
                         alt="Conquest"
                         className="h-6 w-6 rounded object-cover"
                       />
@@ -359,7 +365,7 @@ function App() {
                     </div>
                     <div className="flex items-center gap-3 rounded bg-background/20 px-3 py-2">
                       <img
-                        src="/bloodytoken.jpg"
+                        src={IMAGE_PATHS.bloodyToken}
                         alt="Bloody Token"
                         className="h-6 w-6 rounded object-cover"
                       />
@@ -370,7 +376,7 @@ function App() {
                     </div>
                     <div className="flex items-center gap-3 rounded bg-background/20 px-3 py-2">
                       <img
-                        src="/heraldry.jpg"
+                        src={IMAGE_PATHS.heraldry}
                         alt="Heraldry"
                         className="h-6 w-6 rounded object-cover"
                       />
