@@ -2,6 +2,7 @@
   "name": "pvp-slot-calc",
   "private": true,
   "version": "0.0.0",
+  "homepage": "https://dbowers.io/midnight-s1-pvp",
   "type": "module",
   "scripts": {
     "dev": "vite",
