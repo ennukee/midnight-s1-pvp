@@ -26,6 +26,7 @@ type SlotDefinition = {
   id: string
   label: string
   conquestCost: number
+  bloodyTokenCost: number | null
   heraldryCost: number | null
 }
 
@@ -34,12 +35,16 @@ const createSlot = (
   label: string,
   heraldryCost: number | null,
   conquestOverride?: number,
+  bloodyTokenOverride?: number | null,
 ): SlotDefinition => ({
   id,
   label,
   heraldryCost,
-  conquestCost:
-    conquestOverride ?? (heraldryCost === null ? 0 : heraldryCost * 175),
+  conquestCost: conquestOverride ?? (heraldryCost === null ? 0 : heraldryCost * 175),
+  bloodyTokenCost:
+    bloodyTokenOverride === undefined
+      ? (conquestOverride ?? (heraldryCost === null ? 0 : heraldryCost * 175))
+      : bloodyTokenOverride,
 })
 
 const subtypes = [
@@ -69,10 +74,10 @@ const rightColumnSlots = [
   createSlot('waist', 'Waist', 4),
   createSlot('legs', 'Legs', 5),
   createSlot('feet', 'Feet', 4),
-  createSlot('finger-1', 'Finger 1', null, 525),
-  createSlot('finger-2', 'Finger 2', null, 525),
-  createSlot('trinket-1', 'Trinket 1', null, 700),
-  createSlot('trinket-2', 'Trinket 2', null, 700),
+  createSlot('finger-1', 'Finger 1', 3, 525, null),
+  createSlot('finger-2', 'Finger 2', 3, 525, null),
+  createSlot('trinket-1', 'Trinket 1', null, 700, null),
+  createSlot('trinket-2', 'Trinket 2', null, 700, null),
 ]
 
 const weaponSlots = [
@@ -156,6 +161,7 @@ function App() {
     let conquestSpent = 0
     let bloodySpent = 0
     let heraldryNeeded = 0
+    const invalidBloodyTokenSlots: string[] = []
     const invalidHeraldrySlots: string[] = []
 
     for (const slot of allSlots) {
@@ -166,7 +172,11 @@ function App() {
       }
 
       if (subtype === 'bloody token') {
-        bloodySpent += slot.conquestCost
+        if (slot.bloodyTokenCost === null) {
+          invalidBloodyTokenSlots.push(slot.label)
+        } else {
+          bloodySpent += slot.bloodyTokenCost
+        }
       }
 
       if (subtype === 'heraldry') {
@@ -191,6 +201,7 @@ function App() {
       totalConquestRequired,
       conquestOverCap: totalConquestRequired > MAX_CONQUEST,
       bloodyOverCap: bloodySpent > MAX_BLOODY_TOKENS,
+      invalidBloodyTokenSlots,
       invalidHeraldrySlots,
     }
   }, [slotConfig])
@@ -214,8 +225,11 @@ function App() {
           <div className="flex items-center gap-2">
             {subtypes.map((entry) => {
               const isSelected = currentSubtype === entry.key
+              const isBloodyTokenDisabled =
+                entry.key === 'bloody token' && slot.bloodyTokenCost === null
               const isHeraldryDisabled =
                 entry.key === 'heraldry' && slot.heraldryCost === null
+              const isDisabled = isBloodyTokenDisabled || isHeraldryDisabled
 
               return (
                 <Button
@@ -225,11 +239,13 @@ function App() {
                   className="group relative h-10 w-10 p-0"
                   onClick={() => setSlotSubtype(slot.id, entry.key)}
                   title={
-                    isHeraldryDisabled
+                    isBloodyTokenDisabled
+                      ? `${entry.label} (not available for ${slot.label})`
+                      : isHeraldryDisabled
                       ? `${entry.label} (not available for ${slot.label})`
                       : entry.label
                   }
-                  disabled={isHeraldryDisabled}
+                  disabled={isDisabled}
                 >
                   {entry.image ? (
                     <img
@@ -312,7 +328,8 @@ function App() {
 
                 <div
                   className={`rounded-md border px-4 py-4 text-base ${
-                    resourceTotals.bloodyOverCap
+                    resourceTotals.bloodyOverCap ||
+                    resourceTotals.invalidBloodyTokenSlots.length > 0
                       ? 'border-destructive bg-destructive/10 text-destructive'
                       : 'bg-muted/30'
                   }`}
@@ -321,6 +338,11 @@ function App() {
                   <p className="text-lg font-semibold">
                     {resourceTotals.bloodySpent} / {MAX_BLOODY_TOKENS}
                   </p>
+                  {resourceTotals.invalidBloodyTokenSlots.length > 0 ? (
+                    <p className="text-sm">
+                      Not eligible: {resourceTotals.invalidBloodyTokenSlots.join(', ')}
+                    </p>
+                  ) : null}
                 </div>
 
                 <div className="rounded-md border bg-muted/30 px-4 py-4 text-base">
