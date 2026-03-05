@@ -69,8 +69,8 @@ const rightColumnSlots = [
   createSlot('waist', 'Waist', 4),
   createSlot('legs', 'Legs', 5),
   createSlot('feet', 'Feet', 4),
-  createSlot('finger-1', 'Finger 1', 3),
-  createSlot('finger-2', 'Finger 2', 3),
+  createSlot('finger-1', 'Finger 1', null, 525),
+  createSlot('finger-2', 'Finger 2', null, 525),
   createSlot('trinket-1', 'Trinket 1', null, 700),
   createSlot('trinket-2', 'Trinket 2', null, 700),
 ]
